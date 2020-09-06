@@ -1,0 +1,54 @@
+version: "2"
+services:
+
+    api:
+        image: mrszymonello/ppm-api:latest
+        networks:
+            - net
+        ports:
+            - "5000:5000"
+        env_file:
+            - ./.env
+        volumes:
+            - ./appsettings.json:/dotnetapp/appsettings.json
+        restart: always
+
+    calculate_magnetic_field:
+        image: mrszymonello/ppm-core:calculate_magnetic_field
+        networks:
+            - net
+        env_file:
+            - ./.env
+        restart: always
+
+    generate_plot:
+        image: mrszymonello/ppm-core:generate_plot
+        networks:
+            - net
+        env_file:
+            - ./.env
+        restart: always
+
+    web:
+        image: mrszymonello/iot-web-app:latest
+        networks:
+            - net
+        ports:
+            - "4200:4200"
+        volumes:
+            - ./config.json:/usr/share/nginx/html/config.json
+        restart: always
+        
+    seq:
+        image: datalust/seq
+        networks:
+            - net
+        ports:
+            - 5341:5341
+        restart: always
+        environment:
+            - ACCEPT_EULA=Y
+
+networks:
+    net:
+        driver: bridge
